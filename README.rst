@@ -44,7 +44,7 @@ The next steps involve interacting with AWS through the `AWS Management Console`
 
 **Step 2: Create a new SNS topic.**
 
-Django-Bouncy is reliant on a Simple Notification Service (SNS) ``Topic`` being created and your new Django Bouncy endpoint being set as a subscriber. You can find information in the AWS documentation on how to `Create a SNS Topic`_ 
+Django-Bouncy is reliant on a Simple Notification Service (SNS) ``Topic`` being created and your new Django Bouncy endpoint being set as a subscriber. You can find information in the AWS documentation on how to `Create a SNS Topic`_
 
 
 **Step 3: Ensure that your app is deployed with a valid Django-Bouncy endpoint.**
@@ -128,8 +128,8 @@ You can adjust the cache you wish Django Bouncy to store the certificate in by c
 
 Credits
 -------
-Django Bouncy was initially written in-house at `Organizing for Action`_ led by `Nick Catalano`_, and the source code is available on the `Django Bouncy GitHub Repository`_.
+Django Bouncy was initially written in-house at `Organizing for Action`_ as part of the `Connect`_ project., and the source code is available on the `Django Bouncy GitHub Repository`_.
 
-.. _Organizing for Action: http://www.barackobama.com/
-.. _Nick Catalano: https://github.com/nickcatal
-.. _Django Bouncy GitHub Repository: https://github.com/ofa/django-bouncy
+.. _Organizing for Action: http://www.ofa.us/
+.. _Connect: https://github.com/organizerconnect/connect
+.. _Django Bouncy GitHub Repository: https://github.com/organizerconnect/django-bouncy
