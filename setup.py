@@ -1,16 +1,16 @@
 #!/usr/bin/env python
 
-from setuptools import setup
-
 import os
 # import sys
 import textwrap
+
+from setuptools import setup
 
 ROOT = os.path.abspath(os.path.dirname(__file__))
 
 setup(
     name='django-bouncy',
-    version='0.2.8',
+    version='0.2.9',
     author='Nick Catalano',
     packages=[
         'django_bouncy', 'django_bouncy.migrations', 'django_bouncy.tests'],
