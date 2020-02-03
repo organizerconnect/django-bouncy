@@ -18,18 +18,18 @@ except ImportError:
     from urllib.parse import urlparse
 
 import base64
-import re
-import pem
 import logging
-import six
+import re
 
-from OpenSSL import crypto
+import dateutil.parser
+import pem
+import six
 from django.conf import settings
 from django.core.cache import caches
 from django.http import HttpResponse, HttpResponseBadRequest
 from django.utils import timezone
 from django.utils.encoding import smart_bytes
-import dateutil.parser
+from OpenSSL import crypto
 
 from django_bouncy import signals
 
@@ -107,8 +107,8 @@ def verify_notification(data):
         hash_format = SUBSCRIPTION_HASH_FORMAT
 
     try:
-        crypto.verify(
-            cert, signature, six.b(hash_format.format(**data)), 'sha1')
+        hashed_data = hash_format.format(**data)
+        crypto.verify(cert, signature, hashed_data.encode('utf-8'), 'sha1')
     except crypto.Error:
         return False
     return True
