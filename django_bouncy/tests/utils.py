@@ -57,13 +57,13 @@ class TestVerificationSystem(BouncyTestCase):
         self.assertTrue(result)
     
     @patch('django_bouncy.utils.grab_keyfile')
-    def test_verify_subscription_notification_encode_fails(self, mock):
+    def test_verify_subscription_notification_encode(self, mock):
         """Test the verification of a valid subscription notification"""
         mock.return_value = self.pemfile
 
         notification = loader('subscriptionconfirmationencodefails')
         result = utils.verify_notification(notification)
-        self.assertFalse(result)
+        self.assertTrue(result)
 
     @patch('django_bouncy.utils.grab_keyfile')
     def test_notification_verification_failure(self, mock):
