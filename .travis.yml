@@ -6,6 +6,7 @@ python:
   - "3.4"
   - "3.5"
   - "3.6"
+  - "3.7"
   - "pypy"
 # command to define we should test against the latest version of all supported
 # versions of django (1.11.x, 2.0.x, 2.1.x)
@@ -13,6 +14,7 @@ env:
   - DJANGO_INSTALL=django\<1.11.99
   - DJANGO_INSTALL=django\<2.0.99
   - DJANGO_INSTALL=django\<2.1.99
+  - DJANGO_INSTALL=django\<2.2.99 
   - DJANGO_INSTALL=git+https://github.com/django/django.git\#egg=django
 # command to install dependencies (mock & nose are already installed)
 install:
