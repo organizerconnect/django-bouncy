@@ -1,6 +1,10 @@
 """Tests for utils.py in the django-bouncy app"""
 from django.conf import settings
 from django.dispatch import receiver
+
+from django_bouncy import signals, utils
+from django_bouncy.tests.helpers import BouncyTestCase, loader
+
 try:
     # Python 2.6/2.7
     from mock import Mock, patch
@@ -8,8 +12,6 @@ except ImportError:
     # Python 3
     from unittest.mock import Mock, patch
 
-from django_bouncy.tests.helpers import BouncyTestCase, loader
-from django_bouncy import utils, signals
 
 
 class TestVerificationSystem(BouncyTestCase):
@@ -53,6 +55,15 @@ class TestVerificationSystem(BouncyTestCase):
         notification = loader('subscriptionconfirmation')
         result = utils.verify_notification(notification)
         self.assertTrue(result)
+    
+    @patch('django_bouncy.utils.grab_keyfile')
+    def test_verify_subscription_notification_encode_fails(self, mock):
+        """Test the verification of a valid subscription notification"""
+        mock.return_value = self.pemfile
+
+        notification = loader('subscriptionconfirmationencodefails')
+        result = utils.verify_notification(notification)
+        self.assertFalse(result)
 
     @patch('django_bouncy.utils.grab_keyfile')
     def test_notification_verification_failure(self, mock):
