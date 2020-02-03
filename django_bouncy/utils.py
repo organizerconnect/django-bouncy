@@ -20,6 +20,7 @@ except ImportError:
 import base64
 import logging
 import re
+import sys
 
 import dateutil.parser
 import pem
@@ -99,7 +100,10 @@ def verify_notification(data):
     """
     pemfile = grab_keyfile(data['SigningCertURL'])
     cert = crypto.load_certificate(crypto.FILETYPE_PEM, pemfile)
-    signature = base64.decodebytes((data['Signature']).encode())
+    if sys.version_info[0] == 3:
+        signature = base64.decodebytes((data['Signature']).encode())
+    else:
+        signature = base64.decodestring(six.b(data['Signature']))
 
     if data['Type'] == "Notification":
         hash_format = NOTIFICATION_HASH_FORMAT
