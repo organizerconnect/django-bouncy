@@ -18,18 +18,19 @@ except ImportError:
     from urllib.parse import urlparse
 
 import base64
-import re
-import pem
 import logging
-import six
+import re
+import sys
 
-from OpenSSL import crypto
+import dateutil.parser
+import pem
+import six
 from django.conf import settings
 from django.core.cache import caches
 from django.http import HttpResponse, HttpResponseBadRequest
 from django.utils import timezone
 from django.utils.encoding import smart_bytes
-import dateutil.parser
+from OpenSSL import crypto
 
 from django_bouncy import signals
 
@@ -99,7 +100,10 @@ def verify_notification(data):
     """
     pemfile = grab_keyfile(data['SigningCertURL'])
     cert = crypto.load_certificate(crypto.FILETYPE_PEM, pemfile)
-    signature = base64.decodestring(six.b(data['Signature']))
+    if sys.version_info[0] == 3:
+        signature = base64.decodebytes((data['Signature']).encode())
+    else:
+        signature = base64.decodestring(six.b(data['Signature']))
 
     if data['Type'] == "Notification":
         hash_format = NOTIFICATION_HASH_FORMAT
@@ -108,7 +112,10 @@ def verify_notification(data):
 
     try:
         crypto.verify(
-            cert, signature, six.b(hash_format.format(**data)), 'sha1')
+            cert,
+            signature,
+            (hash_format.format(**data)).encode('utf-8'),
+            'sha1')
     except crypto.Error:
         return False
     return True
