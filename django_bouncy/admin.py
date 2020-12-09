@@ -8,7 +8,7 @@ from django_bouncy.models import Bounce, Complaint, Delivery, Send, Open, Click,
 class BounceAdmin(admin.ModelAdmin):
     """Admin model for 'Bounce' objects"""
     list_display = (
-        'address', 'mail_from', 'bounce_type', 'bounce_subtype', 'status')
+        'feedback_timestamp', 'address', 'mail_from', 'bounce_type', 'bounce_subtype', 'status')
     list_filter = (
         'hard', 'action', 'bounce_type', 'bounce_subtype',
         'feedback_timestamp'
@@ -18,20 +18,21 @@ class BounceAdmin(admin.ModelAdmin):
 
 class ComplaintAdmin(admin.ModelAdmin):
     """Admin model for 'Complaint' objects"""
-    list_display = ('address', 'mail_from', 'feedback_type')
+    list_display = ('feedback_timestamp', 'address', 'mail_from', 'feedback_type')
     list_filter = ('feedback_type', 'feedback_timestamp')
     search_fields = ('address',)
 
 
 class DeliveryAdmin(admin.ModelAdmin):
     """Admin model for 'Delivery' objects"""
-    list_display = ('address', 'mail_from')
-    list_filter = ('feedback_timestamp',)
+    list_display = ('delivered_time', 'address', 'mail_from')
+    list_filter = ('delivered_time',)
     search_fields = ('address',)
 
 
 class SendAdmin(admin.ModelAdmin):
-    list_display = ('address', 'mail_from',)
+    list_display = ('mail_timestamp', 'address', 'mail_from',)
+    list_filter = ('mail_timestamp',)
     search_fields = ('address',)
 
 
@@ -48,7 +49,8 @@ class ClickAdmin(admin.ModelAdmin):
 
 
 class RenderingFailureAdmin(admin.ModelAdmin):
-    list_display = ('address', 'mail_from', 'template_name', 'error_message',)
+    list_display = ('mail_timestamp', 'address', 'mail_from', 'template_name', 'error_message',)
+    list_filter = ('mail_timestamp',)
     search_fields = ('address', 'template_name',)
 
 
