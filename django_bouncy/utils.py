@@ -45,6 +45,21 @@ Type
 {Type}
 '''
 
+NOTIFICATION_WITH_SUBJECT_HASH_FORMAT = u'''Message
+{Message}
+MessageId
+{MessageId}
+Subject
+{Subject}
+Timestamp
+{Timestamp}
+TopicArn
+{TopicArn}
+Type
+{Type}
+'''
+
+
 SUBSCRIPTION_HASH_FORMAT = u'''Message
 {Message}
 MessageId
@@ -102,7 +117,10 @@ def verify_notification(data):
     signature = base64.decodestring(six.b(data['Signature']))
 
     if data['Type'] == "Notification":
-        hash_format = NOTIFICATION_HASH_FORMAT
+        if 'Subject' in data:
+            hash_format = NOTIFICATION_WITH_SUBJECT_HASH_FORMAT
+        else:
+            hash_format = NOTIFICATION_HASH_FORMAT
     else:
         hash_format = SUBSCRIPTION_HASH_FORMAT
 
