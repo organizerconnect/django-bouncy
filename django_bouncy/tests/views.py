@@ -18,7 +18,7 @@ except ImportError:
 from django_bouncy.tests.helpers import BouncyTestCase, loader
 from django_bouncy import views, signals
 from django_bouncy.utils import clean_time
-from django_bouncy.models import Bounce, Complaint, Delivery
+from django_bouncy.models import Bounce, Complaint, Delivery, Send, Open, Click, Reject, RenderingFailure, DeliveryDelay
 
 
 class BouncyEndpointViewTest(BouncyTestCase):
@@ -409,3 +409,348 @@ class ProcessDeliveryTest(BouncyTestCase):
             smtp_response='250 ok:  Message 64111812 accepted'
         ).exists())
 
+
+class ProcessSendTest(BouncyTestCase):
+    def setUp(self):
+        self.send = loader('send')
+
+    def test_send_created(self):
+        """Test that the Send object was created"""
+        original_count = Send.objects.count()
+        result = views.process_send(
+            self.send, self.notification)
+        new_count = Send.objects.count()
+
+        self.assertEqual(new_count, original_count + 1)
+        self.assertEqual(result.status_code, 200)
+        self.assertEqual(result.content.decode('ascii'), 'Send Processed')
+
+    def test_signals_sent(self):
+        """Test that the django send signal was sent"""
+        # pylint: disable=attribute-defined-outside-init, unused-variable
+        self.signal_count = 0
+
+        @receiver(signals.feedback)
+        def _signal_receiver(sender, **kwargs):
+            """Test signal receiver"""
+            # pylint: disable=unused-argument
+            self.signal_count += 1
+            self.signal_notification = kwargs['notification']
+            self.signal_message = kwargs['message']
+
+        result = views.process_send(
+            self.send, self.notification)
+
+        self.assertEqual(result.status_code, 200)
+        self.assertEqual(result.content.decode('ascii'), 'Send Processed')
+        self.assertEqual(self.signal_count, 1)
+        self.assertEqual(self.signal_notification, self.notification)
+
+    def test_correct_send_created(self):
+        """Test that the correct delivery was created"""
+        Send.objects.all().delete()
+
+        result = views.process_send(
+            self.send, self.notification)
+
+        self.assertEqual(result.status_code, 200)
+        self.assertEqual(result.content.decode('ascii'), 'Send Processed')
+        self.assertTrue(Send.objects.filter(
+            sns_topic='arn:aws:sns:us-east-1:250214102493:Demo_App_Unsubscribes',
+            sns_messageid='f34c6922-c3a1-54a1-bd88-23f998b43978',
+            mail_timestamp=clean_time('2016-10-14T05:02:16.645Z'),
+            mail_id='EXAMPLE7c191be45-e9aedb9a-02f9-4d12-a87d-dd0099a07f8a-000000',
+            mail_from='sender@example.com',
+            address='recipient@example.com',
+        ).exists())
+
+
+class ProcessOpenTest(BouncyTestCase):
+    def setUp(self):
+        self.open = loader('open')
+
+    def test_open_created(self):
+        """Test that the Open object was created"""
+        original_count = Open.objects.count()
+        result = views.process_open(
+            self.open, self.notification)
+        new_count = Open.objects.count()
+
+        self.assertEqual(new_count, original_count + 1)
+        self.assertEqual(result.status_code, 200)
+        self.assertEqual(result.content.decode('ascii'), 'Open Processed')
+
+    def test_signals_sent(self):
+        """Test that the django open signal was sent"""
+        # pylint: disable=attribute-defined-outside-init, unused-variable
+        self.signal_count = 0
+
+        @receiver(signals.feedback)
+        def _signal_receiver(sender, **kwargs):
+            """Test signal receiver"""
+            # pylint: disable=unused-argument
+            self.signal_count += 1
+            self.signal_notification = kwargs['notification']
+            self.signal_message = kwargs['message']
+
+        result = views.process_open(
+            self.open, self.notification)
+
+        self.assertEqual(result.status_code, 200)
+        self.assertEqual(result.content.decode('ascii'), 'Open Processed')
+        self.assertEqual(self.signal_count, 1)
+        self.assertEqual(self.signal_notification, self.notification)
+
+    def test_correct_open_created(self):
+        """Test that the correct open was created"""
+        Open.objects.all().delete()
+
+        result = views.process_open(
+            self.open, self.notification)
+
+        self.assertEqual(result.status_code, 200)
+        self.assertEqual(result.content.decode('ascii'), 'Open Processed')
+        self.assertTrue(Open.objects.filter(
+            sns_topic='arn:aws:sns:us-east-1:250214102493:Demo_App_Unsubscribes',
+            sns_messageid='f34c6922-c3a1-54a1-bd88-23f998b43978',
+            mail_timestamp=clean_time('2017-08-09T21:59:49.927Z'),
+            mail_id='EXAMPLE7c191be45-e9aedb9a-02f9-4d12-a87d-dd0099a07f8a-000000',
+            mail_from='sender@example.com',
+            address='recipient@example.com',
+            opened_time=clean_time('2017-08-09T22:00:19.652Z'),
+            ip_address='192.0.2.1',
+            useragent='Mozilla/5.0 (iPhone; CPU iPhone OS 10_3_3 like Mac OS X) AppleWebKit/603.3.8 (KHTML, like Gecko) Mobile/14G60'
+        ).exists())
+
+
+class ProcessClickTest(BouncyTestCase):
+    def setUp(self):
+        self.click = loader('click')
+
+    def test_click_created(self):
+        """Test that the Click object was created"""
+        original_count = Click.objects.count()
+        result = views.process_click(
+            self.click, self.notification)
+        new_count = Click.objects.count()
+
+        self.assertEqual(new_count, original_count + 1)
+        self.assertEqual(result.status_code, 200)
+        self.assertEqual(result.content.decode('ascii'), 'Click Processed')
+
+    def test_signals_sent(self):
+        """Test that the django click signal was sent"""
+        # pylint: disable=attribute-defined-outside-init, unused-variable
+        self.signal_count = 0
+
+        @receiver(signals.feedback)
+        def _signal_receiver(sender, **kwargs):
+            """Test signal receiver"""
+            # pylint: disable=unused-argument
+            self.signal_count += 1
+            self.signal_notification = kwargs['notification']
+            self.signal_message = kwargs['message']
+
+        result = views.process_click(
+            self.click, self.notification)
+
+        self.assertEqual(result.status_code, 200)
+        self.assertEqual(result.content.decode('ascii'), 'Click Processed')
+        self.assertEqual(self.signal_count, 1)
+        self.assertEqual(self.signal_notification, self.notification)
+
+    def test_correct_click_created(self):
+        """Test that the correct click was created"""
+        Click.objects.all().delete()
+
+        result = views.process_click(
+            self.click, self.notification)
+
+        self.assertEqual(result.status_code, 200)
+        self.assertEqual(result.content.decode('ascii'), 'Click Processed')
+        self.assertTrue(Click.objects.filter(
+            sns_topic='arn:aws:sns:us-east-1:250214102493:Demo_App_Unsubscribes',
+            sns_messageid='f34c6922-c3a1-54a1-bd88-23f998b43978',
+            mail_timestamp=clean_time('2017-08-09T23:50:05.795Z'),
+            mail_id='EXAMPLE7c191be45-e9aedb9a-02f9-4d12-a87d-dd0099a07f8a-000000',
+            mail_from='sender@example.com',
+            address='recipient@example.com',
+            clicked_time=clean_time('2017-08-09T23:51:25.570Z'),
+            ip_address='192.0.2.1',
+            useragent='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.90 Safari/537.36',
+            link='http://docs.aws.amazon.com/ses/latest/DeveloperGuide/send-email-smtp.html',
+            link_tags="{'samplekey0': ['samplevalue0'], 'samplekey1': ['samplevalue1']}"
+        ).exists())
+
+
+class ProcessRejectTest(BouncyTestCase):
+    def setUp(self):
+        self.reject = loader('reject')
+
+    def test_reject_created(self):
+        """Test that the Reject object was created"""
+        original_count = Reject.objects.count()
+        result = views.process_reject(
+            self.reject, self.notification)
+        new_count = Reject.objects.count()
+
+        self.assertEqual(new_count, original_count + 1)
+        self.assertEqual(result.status_code, 200)
+        self.assertEqual(result.content.decode('ascii'), 'Reject Processed')
+
+    def test_signals_sent(self):
+        """Test that the django reject signal was sent"""
+        # pylint: disable=attribute-defined-outside-init, unused-variable
+        self.signal_count = 0
+
+        @receiver(signals.feedback)
+        def _signal_receiver(sender, **kwargs):
+            """Test signal receiver"""
+            # pylint: disable=unused-argument
+            self.signal_count += 1
+            self.signal_notification = kwargs['notification']
+            self.signal_message = kwargs['message']
+
+        result = views.process_reject(
+            self.reject, self.notification)
+
+        self.assertEqual(result.status_code, 200)
+        self.assertEqual(result.content.decode('ascii'), 'Reject Processed')
+        self.assertEqual(self.signal_count, 1)
+        self.assertEqual(self.signal_notification, self.notification)
+
+    def test_correct_reject_created(self):
+        """Test that the correct reject was created"""
+        Reject.objects.all().delete()
+
+        result = views.process_reject(
+            self.reject, self.notification)
+
+        self.assertEqual(result.status_code, 200)
+        self.assertEqual(result.content.decode('ascii'), 'Reject Processed')
+        self.assertTrue(Reject.objects.filter(
+            sns_topic='arn:aws:sns:us-east-1:250214102493:Demo_App_Unsubscribes',
+            sns_messageid='f34c6922-c3a1-54a1-bd88-23f998b43978',
+            mail_timestamp=clean_time('2016-10-14T17:38:15.211Z'),
+            mail_id='EXAMPLE7c191be45-e9aedb9a-02f9-4d12-a87d-dd0099a07f8a-000000',
+            mail_from='sender@example.com',
+            address='sender@example.com',
+            reason='Bad content'
+        ).exists())
+
+
+class ProcessRenderingFailureTest(BouncyTestCase):
+    def setUp(self):
+        self.rendering_failure = loader('rendering_failure')
+
+    def test_rendering_failure_created(self):
+        """Test that the RenderingFailure object was created"""
+        original_count = RenderingFailure.objects.count()
+        result = views.process_rendering_failure(
+            self.rendering_failure, self.notification)
+        new_count = RenderingFailure.objects.count()
+
+        self.assertEqual(new_count, original_count + 1)
+        self.assertEqual(result.status_code, 200)
+        self.assertEqual(result.content.decode('ascii'), 'Rendering Failure Processed')
+
+    def test_signals_sent(self):
+        """Test that the django rendering failure signal was sent"""
+        # pylint: disable=attribute-defined-outside-init, unused-variable
+        self.signal_count = 0
+
+        @receiver(signals.feedback)
+        def _signal_receiver(sender, **kwargs):
+            """Test signal receiver"""
+            # pylint: disable=unused-argument
+            self.signal_count += 1
+            self.signal_notification = kwargs['notification']
+            self.signal_message = kwargs['message']
+
+        result = views.process_rendering_failure(
+            self.rendering_failure, self.notification)
+
+        self.assertEqual(result.status_code, 200)
+        self.assertEqual(result.content.decode('ascii'), 'Rendering Failure Processed')
+        self.assertEqual(self.signal_count, 1)
+        self.assertEqual(self.signal_notification, self.notification)
+
+    def test_correct_rendering_failure_created(self):
+        """Test that the correct rendering failure was created"""
+        RenderingFailure.objects.all().delete()
+
+        result = views.process_rendering_failure(
+            self.rendering_failure, self.notification)
+
+        self.assertEqual(result.status_code, 200)
+        self.assertEqual(result.content.decode('ascii'), 'Rendering Failure Processed')
+        self.assertTrue(RenderingFailure.objects.filter(
+            sns_topic='arn:aws:sns:us-east-1:250214102493:Demo_App_Unsubscribes',
+            sns_messageid='f34c6922-c3a1-54a1-bd88-23f998b43978',
+            mail_timestamp=clean_time('2018-01-22T18:43:06.197Z'),
+            mail_id='EXAMPLE7c191be45-e9aedb9a-02f9-4d12-a87d-dd0099a07f8a-000000',
+            mail_from='sender@example.com',
+            address='recipient@example.com',
+            template_name='MyTemplate',
+            error_message="Attribute 'attributeName' is not present in the rendering data."
+        ).exists())
+
+
+class ProcessDeliveryDelayTest(BouncyTestCase):
+    def setUp(self):
+        self.delivery_delay = loader('delivery_delay')
+
+    def test_delivery_delay_created(self):
+        """Test that the DeliveryDelay object was created"""
+        original_count = DeliveryDelay.objects.count()
+        result = views.process_delivery_delay(
+            self.delivery_delay, self.notification)
+        new_count = DeliveryDelay.objects.count()
+
+        self.assertEqual(new_count, original_count + 1)
+        self.assertEqual(result.status_code, 200)
+        self.assertEqual(result.content.decode('ascii'), 'Delivery Delay Processed')
+
+    def test_signals_sent(self):
+        """Test that the django delivery delay signal was sent"""
+        # pylint: disable=attribute-defined-outside-init, unused-variable
+        self.signal_count = 0
+
+        @receiver(signals.feedback)
+        def _signal_receiver(sender, **kwargs):
+            """Test signal receiver"""
+            # pylint: disable=unused-argument
+            self.signal_count += 1
+            self.signal_notification = kwargs['notification']
+            self.signal_message = kwargs['message']
+
+        result = views.process_delivery_delay(
+            self.delivery_delay, self.notification)
+
+        self.assertEqual(result.status_code, 200)
+        self.assertEqual(result.content.decode('ascii'), 'Delivery Delay Processed')
+        self.assertEqual(self.signal_count, 1)
+        self.assertEqual(self.signal_notification, self.notification)
+
+    def test_correct_delivery_delay_created(self):
+        """Test that the correct delivery delay was created"""
+        DeliveryDelay.objects.all().delete()
+
+        result = views.process_delivery_delay(
+            self.delivery_delay, self.notification)
+
+        self.assertEqual(result.status_code, 200)
+        self.assertEqual(result.content.decode('ascii'), 'Delivery Delay Processed')
+        self.assertTrue(DeliveryDelay.objects.filter(
+            sns_topic='arn:aws:sns:us-east-1:250214102493:Demo_App_Unsubscribes',
+            sns_messageid='f34c6922-c3a1-54a1-bd88-23f998b43978',
+            mail_timestamp=clean_time('2020-06-16T00:15:40.641Z'),
+            mail_id='EXAMPLE7c191be45-e9aedb9a-02f9-4d12-a87d-dd0099a07f8a-000000',
+            mail_from='sender@example.com',
+            address='recipient@example.com',
+            delayed_time=clean_time('2020-06-16T00:25:40.095Z'),
+            delay_type='TransientCommunicationFailure',
+            expiration_time=clean_time('2020-06-16T00:25:40.914Z'),
+            status='4.4.1',
+            diagnostic_code='smtp; 421 4.4.1 Unable to connect to remote host'
+        ).exists())

@@ -2,7 +2,7 @@
 
 from django.contrib import admin
 
-from django_bouncy.models import Bounce, Complaint, Delivery
+from django_bouncy.models import Bounce, Complaint, Delivery, Send, Open, Click, RenderingFailure, DeliveryDelay
 
 
 class BounceAdmin(admin.ModelAdmin):
@@ -30,6 +30,39 @@ class DeliveryAdmin(admin.ModelAdmin):
     search_fields = ('address',)
 
 
+class SendAdmin(admin.ModelAdmin):
+    list_display = ('address', 'mail_from',)
+    search_fields = ('address',)
+
+
+class OpenAdmin(admin.ModelAdmin):
+    list_display = ('opened_time', 'address', 'mail_from',)
+    list_filter = ('opened_time',)
+    search_fields = ('address',)
+
+
+class ClickAdmin(admin.ModelAdmin):
+    list_display = ('clicked_time', 'address', 'mail_from', 'link',)
+    list_filter = ('clicked_time',)
+    search_fields = ('address',)
+
+
+class RenderingFailureAdmin(admin.ModelAdmin):
+    list_display = ('address', 'mail_from', 'template_name', 'error_message',)
+    search_fields = ('address', 'template_name',)
+
+
+class DeliveryDelayAdmin(admin.ModelAdmin):
+    list_display = ('delayed_time', 'address', 'mail_from', 'delay_type',)
+    list_filter = ('delayed_time',)
+    search_fields = ('address', 'delay_type',)
+
+
 admin.site.register(Bounce, BounceAdmin)
 admin.site.register(Complaint, ComplaintAdmin)
 admin.site.register(Delivery, DeliveryAdmin)
+admin.site.register(Send, SendAdmin)
+admin.site.register(Open, OpenAdmin)
+admin.site.register(Click, ClickAdmin)
+admin.site.register(RenderingFailure, RenderingFailureAdmin)
+admin.site.register(DeliveryDelay, DeliveryDelayAdmin)
