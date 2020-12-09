@@ -314,10 +314,10 @@ def process_delivery(message, notification):
 def process_open(message, notification):
     """Function to process an open notification"""
     mail = message['mail']
-    each_open = message['open']
+    open_ = message['open']
 
-    if 'timestamp' in each_open:
-        opened_datetime = clean_time(each_open['timestamp'])
+    if 'timestamp' in open_:
+        opened_datetime = clean_time(open_['timestamp'])
     else:
         opened_datetime = None
 
@@ -332,8 +332,8 @@ def process_open(message, notification):
             # open
             address=destination,
             opened_time=opened_datetime,
-            ip_address=each_open['ipAddress'],
-            useragent=each_open['userAgent']
+            ip_address=open_['ipAddress'],
+            useragent=open_['userAgent']
         )]
 
     for each_open in opens:
