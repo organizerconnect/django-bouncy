@@ -579,7 +579,7 @@ class ProcessClickTest(BouncyTestCase):
             ip_address='192.0.2.1',
             useragent='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.90 Safari/537.36',
             link='http://docs.aws.amazon.com/ses/latest/DeveloperGuide/send-email-smtp.html',
-            link_tags="{'samplekey0': ['samplevalue0'], 'samplekey1': ['samplevalue1']}"
+            link_tags=json.loads('{"samplekey0": ["samplevalue0"], "samplekey1": ["samplevalue1"]}')
         ).exists())
 
 
