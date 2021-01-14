@@ -126,7 +126,7 @@ def verify_notification(data):
 
     try:
         crypto.verify(
-            cert, signature, six.b(hash_format.format(**data)), 'sha1')
+            cert, signature, hash_format.format(**data).encode('utf-8'), 'sha1')
     except crypto.Error:
         return False
     return True
