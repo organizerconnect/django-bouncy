@@ -13,7 +13,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.conf import settings
 
 from django_bouncy.utils import (
-    verify_notification, approve_subscription, clean_time
+    verify_notification, approve_subscription, clean_time, clean_ip
 )
 from django_bouncy.models import Bounce, Complaint, Delivery, Open, Click, Send, Reject, RenderingFailure, DeliveryDelay
 from django_bouncy import signals
@@ -332,7 +332,7 @@ def process_open(message, notification):
             # open
             address=destination,
             opened_time=opened_datetime,
-            ip_address=open_['ipAddress'],
+            ip_address=clean_ip(open_['ipAddress']),
             useragent=open_['userAgent']
         )]
 
@@ -368,7 +368,7 @@ def process_click(message, notification):
             address=destination,
             # click
             clicked_time=clicked_datetime,
-            ip_address=click['ipAddress'],
+            ip_address=clean_ip(click['ipAddress']),
             useragent=click['userAgent'],
             link=click['link'],
             link_tags=click['linkTags']
@@ -462,7 +462,7 @@ def process_delivery_delay(message, notification):
             delayed_time=clean_time(delivery_delay['timestamp']),
             delay_type=delivery_delay['delayType'],
             expiration_time=clean_time(delivery_delay['expirationTime']),
-            reporting_mta=delivery_delay.get('reportingMTA'),
+            reporting_mta=clean_ip(delivery_delay.get('reportingMTA')),
             status=delayed_recipient['status'],
             diagnostic_code=delayed_recipient['diagnosticCode']
         )]

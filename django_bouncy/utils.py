@@ -23,6 +23,7 @@ import pem
 import logging
 import six
 
+from ipaddress import ip_address
 from OpenSSL import crypto
 from django.conf import settings
 from django.core.cache import caches
@@ -177,3 +178,25 @@ def clean_time(time_string):
         # remove the timezone field
         time = time.astimezone(timezone.utc).replace(tzinfo=None)
     return time
+
+
+def clean_ip(ip_string):
+    """Return a single ip address from the Amazon-provided ip address string"""
+    public_ip_address = None
+    private_ip_address = None
+
+    if ip_string is None:
+        return public_ip_address
+
+    for ip in ip_string.split(','):
+        ip = ip.strip()
+        try:
+            address = ip_address(ip)
+            # Return first public IP found
+            if address.is_global:
+                return ip
+            private_ip_address = ip
+        except ValueError:
+            continue
+
+    return private_ip_address

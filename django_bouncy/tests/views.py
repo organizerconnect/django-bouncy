@@ -518,7 +518,7 @@ class ProcessOpenTest(BouncyTestCase):
             mail_from='sender@example.com',
             address='recipient@example.com',
             opened_time=clean_time('2017-08-09T22:00:19.652Z'),
-            ip_address='192.0.2.1',
+            ip_address='127.0.0.1',
             useragent='Mozilla/5.0 (iPhone; CPU iPhone OS 10_3_3 like Mac OS X) AppleWebKit/603.3.8 (KHTML, like Gecko) Mobile/14G60'
         ).exists())
 
@@ -576,7 +576,7 @@ class ProcessClickTest(BouncyTestCase):
             mail_from='sender@example.com',
             address='recipient@example.com',
             clicked_time=clean_time('2017-08-09T23:51:25.570Z'),
-            ip_address='192.0.2.1',
+            ip_address='62.251.97.95',
             useragent='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.90 Safari/537.36',
             link='http://docs.aws.amazon.com/ses/latest/DeveloperGuide/send-email-smtp.html',
             link_tags=json.loads('{"samplekey0": ["samplevalue0"], "samplekey1": ["samplevalue1"]}')
