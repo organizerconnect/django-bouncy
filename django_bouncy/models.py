@@ -12,7 +12,7 @@ class Feedback(models.Model):
     sns_topic = models.CharField(max_length=350)
     sns_messageid = models.CharField(max_length=100)
     mail_timestamp = models.DateTimeField()
-    mail_id = models.CharField(max_length=100)
+    mail_id = models.CharField(db_index=True, max_length=100)
     mail_from = models.EmailField()
     address = models.EmailField()
     # no feedback for delivery messages
@@ -79,3 +79,80 @@ class Delivery(Feedback):
     class Meta(object):
         """Meta info for the Delivery model"""
         verbose_name_plural = 'deliveries'
+
+
+@python_2_unicode_compatible
+class Send(Feedback):
+    """A send report for an individual email address"""
+
+    def __str__(self):
+        """Unicode representation of Send"""
+        return "%s Send (email sender: %s)" % (
+            self.address, self.mail_from)
+
+
+@python_2_unicode_compatible
+class Reject(Feedback):
+    """A reject report for an individual email address"""
+    reason = models.TextField(blank=True, null=True)
+
+    def __str__(self):
+        """Unicode representation of Reject"""
+        return "%s %s Reject (email sender: %s)" % (
+            self.address, self.reason, self.mail_from)
+
+
+@python_2_unicode_compatible
+class Open(Feedback):
+    """An open report for an individual email address"""
+    opened_time = models.DateTimeField(blank=True, null=True, db_index=True)
+    ip_address = models.GenericIPAddressField(blank=True, null=True)
+    useragent = models.TextField(blank=True, null=True)
+
+    def __str__(self):
+        """Unicode representation of Open"""
+        return "%s Open (email sender: %s)" % (
+            self.address, self.mail_from)
+
+
+@python_2_unicode_compatible
+class Click(Feedback):
+    """A click report for an individual email address"""
+    clicked_time = models.DateTimeField(blank=True, null=True, db_index=True)
+    ip_address = models.GenericIPAddressField(blank=True, null=True)
+    useragent = models.TextField(blank=True, null=True)
+    link = models.TextField(blank=True, null=True)
+    link_tags = models.TextField(blank=True, null=True)
+
+    def __str__(self):
+        """Unicode representation of Click"""
+        return "%s %s Open (email sender: %s)" % (
+            self.address, self.link, self.mail_from)
+
+
+@python_2_unicode_compatible
+class RenderingFailure(Feedback):
+    """A rendering failure report for an individual email address"""
+    template_name = models.TextField(blank=True, null=True, db_index=True)
+    error_message = models.TextField(blank=True, null=True)
+
+    def __str__(self):
+        """Unicode representation of Rendering Failure"""
+        return "%s %s rendering failure %s" % (
+            self.address, self.template_name, self.error_message)
+
+
+@python_2_unicode_compatible
+class DeliveryDelay(Feedback):
+    """A delivery delay report for an individual email address"""
+    delayed_time = models.DateTimeField(blank=True, null=True, db_index=True)
+    delay_type = models.TextField(blank=True, null=True, db_index=True)
+    expiration_time = models.DateTimeField(blank=True, null=True)
+    reporting_mta = models.GenericIPAddressField(blank=True, null=True)
+    status = models.TextField(blank=True, null=True)
+    diagnostic_code = models.TextField(blank=True, null=True)
+
+    def __str__(self):
+        """Unicode representation of Delivery Delay"""
+        return "%s delivery delay %s %s" % (
+            self.address, self.status, self.diagnostic_code)

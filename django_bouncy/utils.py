@@ -23,6 +23,7 @@ import pem
 import logging
 import six
 
+from ipaddress import ip_address
 from OpenSSL import crypto
 from django.conf import settings
 from django.core.cache import caches
@@ -44,6 +45,21 @@ TopicArn
 Type
 {Type}
 '''
+
+NOTIFICATION_WITH_SUBJECT_HASH_FORMAT = u'''Message
+{Message}
+MessageId
+{MessageId}
+Subject
+{Subject}
+Timestamp
+{Timestamp}
+TopicArn
+{TopicArn}
+Type
+{Type}
+'''
+
 
 SUBSCRIPTION_HASH_FORMAT = u'''Message
 {Message}
@@ -102,13 +118,16 @@ def verify_notification(data):
     signature = base64.decodestring(six.b(data['Signature']))
 
     if data['Type'] == "Notification":
-        hash_format = NOTIFICATION_HASH_FORMAT
+        if 'Subject' in data:
+            hash_format = NOTIFICATION_WITH_SUBJECT_HASH_FORMAT
+        else:
+            hash_format = NOTIFICATION_HASH_FORMAT
     else:
         hash_format = SUBSCRIPTION_HASH_FORMAT
 
     try:
         crypto.verify(
-            cert, signature, six.b(hash_format.format(**data)), 'sha1')
+            cert, signature, hash_format.format(**data).encode('utf-8'), 'sha1')
     except crypto.Error:
         return False
     return True
@@ -159,3 +178,25 @@ def clean_time(time_string):
         # remove the timezone field
         time = time.astimezone(timezone.utc).replace(tzinfo=None)
     return time
+
+
+def clean_ip(ip_string):
+    """Return a single ip address from the Amazon-provided ip address string"""
+    public_ip_address = None
+    private_ip_address = None
+
+    if ip_string is None:
+        return public_ip_address
+
+    for ip in ip_string.split(','):
+        ip = ip.strip()
+        try:
+            address = ip_address(ip)
+            # Return first public IP found
+            if address.is_global:
+                return ip
+            private_ip_address = ip
+        except ValueError:
+            continue
+
+    return private_ip_address
