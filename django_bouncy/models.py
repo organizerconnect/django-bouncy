@@ -12,7 +12,7 @@ class Feedback(models.Model):
     sns_topic = models.CharField(max_length=350)
     sns_messageid = models.CharField(max_length=100)
     mail_timestamp = models.DateTimeField()
-    mail_id = models.CharField(max_length=100)
+    mail_id = models.CharField(db_index=True, max_length=100)
     mail_from = models.EmailField()
     address = models.EmailField()
     # no feedback for delivery messages
