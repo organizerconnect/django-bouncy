@@ -1,8 +1,6 @@
 """Models for the django_bouncy app"""
-from __future__ import unicode_literals
 
 from django.db import models
-from django.utils.encoding import python_2_unicode_compatible
 
 
 class Feedback(models.Model):
@@ -25,7 +23,6 @@ class Feedback(models.Model):
         abstract = True
 
 
-@python_2_unicode_compatible
 class Bounce(Feedback):
     """A bounce report for an individual email address"""
     hard = models.BooleanField(db_index=True, verbose_name="Hard Bounce")
@@ -48,7 +45,6 @@ class Bounce(Feedback):
             self.address, self.bounce_type, self.mail_from)
 
 
-@python_2_unicode_compatible
 class Complaint(Feedback):
     """A complaint report for an individual email address"""
     useragent = models.TextField(blank=True, null=True)
@@ -64,7 +60,6 @@ class Complaint(Feedback):
             self.address, self.mail_from)
 
 
-@python_2_unicode_compatible
 class Delivery(Feedback):
     """A delivery report for an individual email address"""
     delivered_time = models.DateTimeField(blank=True, null=True)
