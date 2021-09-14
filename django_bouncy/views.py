@@ -97,7 +97,7 @@ def endpoint(request):
     # Verify that the notification is signed by Amazon
     if (getattr(settings, 'BOUNCY_VERIFY_CERTIFICATE', True)
             and not verify_notification(data)):
-        logger.error('Verification Failure %s', )
+        logger.error('Verification Failure %s', request_body)
         return HttpResponseBadRequest('Improper Signature')
 
     # Send a signal to say a valid notification has been received
